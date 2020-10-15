@@ -36,6 +36,14 @@ const async = require('async');
 const odmOptions = require('./odmOptions');
 const asrProvider = require('./asrProvider');
 const floodMonitor = require('./floodMonitor');
+const morgan = require('morgan');
+var requestStats = require('request-stats');
+//app.use(morgan('[:date[iso]] HTTP/Method: :method URL: :url Status: :status - :res[content-length] bytes - :response-time ms'));
+//morgan(const morgan = require('morgan');
+
+//morgan('[:date[iso]] HTTP/Method: :method URL: :url Status: :status - :res[content-length] bytes - :response-time ms');
+
+
 
 module.exports = {
 	initialize: async function(cloudProvider){
@@ -165,7 +173,18 @@ module.exports = {
             json(res, {error: `Proxy redirect error: ${err.message}`});
         });
 
+	requestStats(proxy, function(stats){
+		console.log(stats);
+	});
+
         const requestListener = async function (req, res) {
+	    
+	    const now_Date = new Date();
+            console.log(`&& In Req Listener  ${req.url}  ${now_Date} and Milliseconds: ${now_Date.getMilliseconds()}`);
+	    //console.log(req);
+	    //console.log("***************************************")
+	    //console.log(res);
+	
             try{
                 const urlParts = url.parse(req.url, true);
                 const { query, pathname } = urlParts;
@@ -230,7 +249,9 @@ module.exports = {
 
                 if (req.method === 'POST' && pathname === '/task/new/init'){
                     const { uuid, tmpPath, die } = taskNew.createContext(req, res);
-
+		    console.log(`Post /task/new/init ${tmpPath}`)
+                    var stats = fs.statSync(tmpPath);
+		    console.log(`Size of the folder ${stats["size"]}`);
                     taskNew.formDataParser(req, async function(params){
                         const { options } = params;
                         if (params.error){
@@ -279,6 +300,7 @@ module.exports = {
                     });
                 }else if (req.method === 'POST' && pathname.indexOf('/task/new/upload') === 0){
                     const taskId = taskNew.getTaskIdFromPath(pathname);
+		    console.log(`Post ${pathname} in task/new/upload`);
                     if (taskId){
                         const saveFilesToDir = path.join('tmp', taskId);
                         async.series([
@@ -301,10 +323,15 @@ module.exports = {
                     }else json(res, { error: `No uuid found in ${pathname}`});
                 }else if (req.method === 'POST' && pathname.indexOf('/task/new/commit') === 0){
                     const taskId = taskNew.getTaskIdFromPath(pathname);
+		    console.log(`Post ${pathname} in task/new/commit`);
+
                     if (taskId){
                         const tmpPath = path.join('tmp', taskId);
                         const bodyFile = path.join(tmpPath, 'body.json');
                         const die = (err) => {
+                            var stats = fs.statSync(tmpPath);
+                            console.log(`/task/new/commit Size of the folder ${stats["size"]}`);
+
                             utils.rmdir(tmpPath);
                             utils.json(res, {error: err});
                             asrProvider.cleanup(taskId);
@@ -355,7 +382,7 @@ module.exports = {
                     }else json(res, { error: `No uuid found in ${pathname}`});
                 }else if (req.method === 'POST' && pathname === '/task/new') {
                     const { uuid, tmpPath, die } = taskNew.createContext(req, res);
-
+                    console.log(`${tmpPath} /task/new`);  
                     taskNew.formDataParser(req, async function(params) {
                         if (params.error){
                             die(params.error);
@@ -518,12 +545,21 @@ module.exports = {
                         json(res, { error: `Cannot handle ${pathname}`});
                     }
                 }
+
+		 const now_Date = new Date();
+          	 console.log(`&& After In Req Listener  ${req.url}  ${now_Date} and Milliseconds: ${now_Date.getMilliseconds()}`);
+		 //console.log(req);
+          	 console.log("***************************************")
+                 //console.log(res);
+
+
             }catch(e){
                 logger.warn(`Uncaught exception: ${e}`);
                 json(res, { error: 'exception'});
                 if (config.debug) throw e;
             }
         };
+	//requestListener.use(morgan('[:date[iso]] HTTP/Method: :method URL: :url Status: :status - :res[content-length] bytes - :response-time ms'));
 
         const servers = [{
             server: http.createServer(requestListener),
@@ -539,7 +575,10 @@ module.exports = {
                 secure: true
             });
         }
-
+        
+	//requestStats(servers[0].server, function(stats){
+	 //console.log(stats);
+	//});
         return servers;
     }
 };

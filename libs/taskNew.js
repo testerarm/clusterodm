@@ -301,7 +301,10 @@ module.exports = {
                 // We use CURL, because NodeJS libraries are buggy
                 const curl = new Curl(),
                       close = curl.close.bind(curl);
-                
+                const now_Date = new Date();
+           	console.log(`&& In a new Curl Instance  ${url}  ${now_Date} and Milliseconds: ${now_Date.getMilliseconds()}`);
+
+
                 const tryClose = () => {
                     try{
                         close();
@@ -338,6 +341,8 @@ module.exports = {
 
                 curl.setOpt(Curl.option.URL, url);
                 curl.setOpt(Curl.option.HTTPPOST, body || []);
+		//console.log("CURL MAX SEND SPEED LARGE  VAR set to in taskNew.js: ")
+		//console.log(config.upload_max_speed)
                 if (config.upload_max_speed) curl.setOpt(Curl.option.MAX_SEND_SPEED_LARGE, config.upload_max_speed);
                 // abort if slower than 30 bytes/sec during 1600 seconds */
                 curl.setOpt(Curl.option.LOW_SPEED_TIME, 1600);
@@ -394,6 +399,7 @@ module.exports = {
                         'Content-Type: multipart/form-data',
                         `set-uuid: ${uuid}`
                     ]);
+		    console.log(`right before curl perform in task new js  ${node.proxyTargetUrl()}/task/new/init?token=${node.getToken()}`);
                     curl.perform();
                 });
             };
@@ -419,6 +425,8 @@ module.exports = {
                                     retries++;
                                     logger.warn(`File upload to ${node} failed, retrying... (${retries})`);
                                     await utils.sleep(2000);
+				    console.log(`Upload file name: ${body}`)
+				    
                                     curl.perform();
                                 }else{
                                     reject(new Error(`${err.message}: maximum upload retries (${MAX_RETRIES}) exceeded`));
@@ -429,6 +437,8 @@ module.exports = {
                             (res) => {
                                 if (!res.success) throw new Error(`no success flag in task upload response`);
                             });
+                        const now_Date = new Date();
+    			console.log(`&& CURL perform ${node.proxyTargetUrl()}/task/new/upload/${uuid}?token=${node.getToken()}  ${now_Date} and Milliseconds: ${now_Date.getMilliseconds()}`);
 
                         curl.perform();
                     });
@@ -438,7 +448,11 @@ module.exports = {
             const taskNewCommit = async () => {
                 return new Promise((resolve, reject) => {
                     const curl = curlInstance(resolve, reject, `${node.proxyTargetUrl()}/task/new/commit/${uuid}?token=${node.getToken()}`);
-                    curl.perform();
+                    const now_Date = new Date();
+    		    console.log(`&& App task commit before curl perform ${node.proxyTargetUrl()}/task/new/commit/${uuid}?token=${node.getToken()}  ${now_Date} and Milliseconds: ${now_Date.getMilliseconds()}`);
+
+ 
+		   curl.perform();
                 });
             };
 

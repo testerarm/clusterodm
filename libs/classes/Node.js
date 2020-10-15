@@ -78,6 +78,7 @@ module.exports = class Node{
 
     async postRequest(url, formData = {}, query = {}){
         try{
+            console.log(`Print post request form data in Node.js ${formData} and url: ${url}`);
             let response = await axios.post(this.urlFor(url, query), formData, { 
                                 timeout: this.timeout,
                             });

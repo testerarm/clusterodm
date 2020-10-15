@@ -1,0 +1,36 @@
+Script started on 2020-10-04 22:30:03-04:00 [TERM="xterm-256color" TTY="/dev/pts/1" COLUMNS="191" LINES="24"]
+root@raspberrypi:/home/pi/test/ClusterODM# sudo node index.js 
+warn: Running in debug mode
+info: ClusterODM 1.4.4 started with PID 29634
+info: Starting admin CLI on 8080
+warn: No admin CLI password specified, make sure port 8080 is secured
+info: Starting admin web interface on 10000
+warn: No admin password specified, make sure port 10000 is secured
+info: Cloud: LocalCloudProvider
+info: Loaded 1 nodes
+info: Loaded 22 routes
+info: Starting http proxy on 3000
+^Cinfo: Saved nodes to disk
+info: Saved routes to disk
+info: Bye!
+root@raspberrypi:/home/pi/test/ClusterODM# sudo node index.js 
+warn: Running in debug mode
+info: ClusterODM 1.4.4 started with PID 29653
+info: Starting admin CLI on 8080
+warn: No admin CLI password specified, make sure port 8080 is secured
+info: Starting admin web interface on 10000
+warn: No admin password specified, make sure port 10000 is secured
+info: Cloud: LocalCloudProvider
+info: Loaded 1 nodes
+info: Loaded 22 routes
+info: Starting http proxy on 3000
+&& In Req Listener  /info  Sun Oct 04 2020 22:31:53 GMT-0400 (Eastern Daylight Time) and Milliseconds: 520
+warn: Cannot update info for 192.168.1.56:3000: connect ECONNREFUSED 192.168.1.56:3000
+warn: Cannot update info for 192.168.1.56:3000: connect ECONNREFUSED 192.168.1.56:3000
+^Cinfo: Saved nodes to disk
+info: Saved routes to disk
+info: Bye!
+root@raspberrypi:/home/pi/test/ClusterODM# exit
+exit
+
+Script done on 2020-10-04 22:34:19-04:00 [COMMAND_EXIT_CODE="0"]

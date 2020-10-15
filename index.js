@@ -24,6 +24,11 @@ const nodes = require('./libs/nodes');
 const proxy = require('./libs/proxy');
 const floodMonitor = require('./libs/floodMonitor');
 const routetable = require('./libs/routetable');
+//const morgan = require('morgan');
+const requestStats = require('request-stats');
+//app.use(morgan('[:date[iso]] HTTP/Method: :method URL: :url Status: :status - :res[content-length] bytes - :response-time ms'));
+
+
 
 (async function(){
     if (config.debug) logger.warn("Running in debug mode");
@@ -72,5 +77,19 @@ const routetable = require('./libs/routetable');
 
         logger.info(`Starting ${proxy.secure ? 'https' : 'http'} proxy on ${port}`);
         proxy.server.listen(port);
+
+
+       requestStats(proxy.server, function(stats){
+	 console.log(stats);
+	});
+
+        
     });
 })();
+
+
+requestStats(proxy, function(stats){
+	    console.log('here');
+             console.log(stats);
+});
+
